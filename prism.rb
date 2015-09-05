@@ -11,13 +11,14 @@ class Prism < Formula
 
     system "make"
 
-    inreplace "bin/prism", pwd, prefix
-    inreplace "bin/xprism", pwd, prefix
+    inreplace Dir["bin/*"], pwd, libexec
 
     rm_f ["install.sh", "Makefile"]
     rm_rf ["cudd", "ext", "include", "obj", "src"]
 
-    prefix.install Dir["*"]
+    libexec.install Dir["*"]
+    bin.install_symlink Dir["#{libexec}/bin/*"]
+    lib.install_symlink Dir["#{libexec}/lib/*.dylib", "#{libexec}/lib/*.jnilib"]
   end
 
   test do
@@ -31,6 +32,7 @@ class Prism < Formula
       endmodule
       module M2 = M1 [ x=y, y=x ] endmodule
     EOS
-    system "#{bin}/prism test.nm -pf 'P>=1 [ G !(x=2 & y=2) ]' | grep 'Result: true'"
+
+    assert_match /^Result: true/, shell_output("#{bin}/prism test.nm -pf 'P>=1 [ G !(x=2 & y=2) ]'")
   end
 end
