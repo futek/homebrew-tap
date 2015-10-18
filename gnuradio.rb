@@ -175,6 +175,9 @@ class Gnuradio < Formula
       args << "-DENABLE_#{c.upcase.split("-").join("_")}=ON"
     end
 
+    # Modify global_blocks_path to pick up blocks provided by other formulas
+    inreplace "grc/grc.conf.in", "@blocksdir@", "#{HOMEBREW_PREFIX}/share/gnuradio/grc/blocks"
+
     mkdir "build" do
       system "cmake", "..", *args
       system "make"
